@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
   X,
@@ -13,8 +14,14 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
+  const location = useLocation();
 
-  const links = ["Home", "Our Services", "Projects", "Contact"];
+  const links = [
+    { name: "Home", path: "/" },
+    { name: "Our Services", path: "/services" },
+    { name: "Projects", path: "/projects" },
+    { name: "Contact", path: "/contact" },
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +30,10 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
 
   return (
     <nav
@@ -34,13 +45,15 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Left: Logo */}
-        <h1
-          className={`text-2xl font-bold tracking-wide transition-colors duration-300 ${
-            scrolled ? "text-[#0BA6DF]" : "text-[#0BA6DF]"
-          }`}
-        >
-          ATS Aircon
-        </h1>
+        <Link to="/">
+          <h1
+            className={`text-2xl font-bold tracking-wide transition-colors duration-300 ${
+              scrolled ? "text-[#0BA6DF]" : "text-[#0BA6DF]"
+            }`}
+          >
+            ATS Aircon
+          </h1>
+        </Link>
 
         {/* Center: Links */}
         <ul
@@ -49,11 +62,20 @@ export default function Navbar() {
           }`}
         >
           {links.map((link) => (
-            <li key={link} className="relative cursor-pointer group">
-              <span className="transition-colors duration-300 group-hover:text-[#0BA6DF]">
-                {link}
-              </span>
-              <span className="absolute left-0 -bottom-1 h-0.5 w-0 bg-[#0BA6DF] transition-all duration-300 group-hover:w-full"></span>
+            <li key={link.name} className="relative cursor-pointer group">
+              <Link
+                to={link.path}
+                className={`transition-colors duration-300 group-hover:text-[#0BA6DF] ${
+                  isActive(link.path) ? "text-[#0BA6DF]" : ""
+                }`}
+              >
+                {link.name}
+              </Link>
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 bg-[#0BA6DF] transition-all duration-300 ${
+                  isActive(link.path) ? "w-full" : "w-0 group-hover:w-full"
+                }`}
+              ></span>
             </li>
           ))}
         </ul>
@@ -104,7 +126,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Using FIXED positioning like in your sample */}
       <div
         className={`md:hidden fixed inset-x-4 top-[90px] rounded-3xl bg-[#132440] shadow-2xl overflow-hidden transition-all duration-500 ${
           open ? "max-h-[520px] opacity-100" : "max-h-0 opacity-0"
@@ -113,30 +135,22 @@ export default function Navbar() {
         <ul className="flex flex-col divide-y divide-white/10">
           {links.map((link) => (
             <li
-              key={link}
+              key={link.name}
               onClick={() => {
                 setTimeout(() => setOpen(false), 200);
               }}
-              className="
-    group
-    px-6 py-4
-    text-center
-    text-white text-lg font-medium tracking-wide
-    transition-all duration-300 ease-out
-    hover:bg-white/10
-    active:bg-white/20
-  "
+              className={`group px-6 py-4 text-center text-lg font-medium tracking-wide transition-all duration-300 ease-out hover:bg-white/10 active:bg-white/20 ${
+                isActive(link.path)
+                  ? "bg-white/10 text-[#0BA6DF]"
+                  : "text-white"
+              }`}
             >
-              <span
-                className="
-      inline-block
-      transition-transform duration-300
-      group-hover:translate-x-1
-      active:translate-x-1
-    "
+              <Link
+                to={link.path}
+                className="inline-block transition-transform duration-300 group-hover:translate-x-1 active:translate-x-1"
               >
-                {link}
-              </span>
+                {link.name}
+              </Link>
             </li>
           ))}
 
